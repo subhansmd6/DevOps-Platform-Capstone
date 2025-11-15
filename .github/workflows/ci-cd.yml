@@ -14,7 +14,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      # Unique Docker image tag per workflow run
       DOCKER_IMAGE: subhansmd6/java-app:${{ github.run_number }}
+      ARTIFACT_VERSION: 0.0.1-${{ github.run_number }}
 
     steps:
     # Step 1: Checkout the code
@@ -39,7 +41,7 @@ jobs:
     # Step 4: Compile the project
     - name: Compile Project
       working-directory: LoginRegistration
-      run: mvn clean compile
+      run: mvn clean compile -Drevision=${{ env.ARTIFACT_VERSION }}
 
     # Step 5: SonarQube Analysis
     - name: SonarQube Scan
@@ -50,12 +52,13 @@ jobs:
         mvn sonar:sonar \
           -Dsonar.projectKey=java-project \
           -Dsonar.host.url=http://54.149.56.125:9000 \
-          -Dsonar.login=${SONAR_TOKEN}
+          -Dsonar.login=${SONAR_TOKEN} \
+          -Drevision=${{ env.ARTIFACT_VERSION }}
 
     # Step 6: Build WAR
     - name: Build WAR
       working-directory: LoginRegistration
-      run: mvn clean package -DskipTests
+      run: mvn clean package -DskipTests -Drevision=${{ env.ARTIFACT_VERSION }}
 
     # Step 7: Deploy WAR to Nexus
     - name: Deploy WAR to Nexus
@@ -64,7 +67,7 @@ jobs:
         NEXUS_USER: ${{ secrets.NEXUS_USER }}
         NEXUS_PASS: ${{ secrets.NEXUS_PASS }}
       run: |
-        mvn deploy -DskipTests \
+        mvn deploy -DskipTests -Drevision=${{ env.ARTIFACT_VERSION }} \
           -DaltDeploymentRepository=maven-releases::default::http://${NEXUS_USER}:${NEXUS_PASS}@54.149.56.125:8081/repository/maven-releases
 
     # Step 8: Build Docker Image
