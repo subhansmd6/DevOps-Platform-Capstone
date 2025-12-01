@@ -1,0 +1,14 @@
+- name: Run SonarQube analysis (from build server)
+  hosts: build
+  become: yes
+  vars_files:
+    - ../vars/secrets.yml
+  tasks:
+    - name: Run SonarQube analysis with Maven
+      shell: |
+        mvn -B sonar:sonar \
+          -Dsonar.projectKey=java-project \
+          -Dsonar.host.url=http://44.244.9.60:9000 \
+          -Dsonar.login={{ sonar_token }}
+      args:
+        chdir: /opt/project/Java-code
