@@ -1,0 +1,37 @@
+---
+- name: Install Java 17 + Maven on Build Server (Ubuntu)
+  hosts: build
+  become: yes
+
+  tasks:
+
+    - name: Update APT cache
+      apt:
+        update_cache: yes
+
+    - name: Install Java 17
+      apt:
+        name: openjdk-17-jdk
+        state: present
+
+    - name: Install Maven
+      apt:
+        name: maven
+        state: present
+
+    - name: Verify Java version
+      command: java -version
+      register: java_ver
+      ignore_errors: yes
+
+    - debug:
+        msg: "Java version installed: {{ java_ver.stderr }}"
+
+    - name: Verify Maven version
+      command: mvn -version
+      register: mvn_ver
+      ignore_errors: yes
+
+    - debug:
+        msg: "Maven version installed: {{ mvn_ver.stdout }}"
+
