@@ -1,0 +1,66 @@
+- name: Fetch WAR from build server to control node
+  hosts: build
+  become: yes
+  vars_files:
+    - ../vars/secrets.yml
+  tasks:
+    - name: Find WAR file
+      find:
+        paths: /opt/project/Java-code/target
+        patterns: "*.war"
+      register: war_file
+
+    - name: Fail if no WAR found
+      fail:
+        msg: "WAR file not found on build server!"
+      when: war_file.matched == 0
+
+    - name: Fetch WAR to Jenkins/control node
+      fetch:
+        src: "{{ war_file.files[0].path }}"
+        dest: /tmp/app.war
+        flat: yes
+
+
+# ───────────────────────────────
+# Second play — runs entirely on the Jenkins machine itself
+# ───────────────────────────────
+- name: Upload WAR directly to Nexus (from Jenkins/control node)
+  hosts: localhost               # ← this is your Jenkins/Ansible control machine
+  connection: local              # ← very important
+  become: false                  # ← no sudo needed
+  vars_files:
+    - ../vars/secrets.yml
+  tasks:
+
+    - name: Create /apps/ directory in Nexus raw repository (if missing)
+      uri:
+        url: "{{ nexus_url }}/repository/raw-releases/apps/"
+        method: PUT
+        user: "{{ nexus_user }}"
+        password: "{{ nexus_pass }}"
+        force_basic_auth: yes
+        body: ""
+        headers:
+          Content-Type: "text/plain"
+        status_code: 201, 204
+      ignore_errors: yes          # succeeds with 201 or 204, or already exists
+
+    - name: Upload WAR to Nexus
+      uri:
+        url: "{{ nexus_url }}/repository/raw-releases/apps/app-1.0.war"
+        method: PUT
+        user: "{{ nexus_user }}"
+        password: "{{ nexus_pass }}"
+        force_basic_auth: yes
+        src: /tmp/app.war
+        remote_src: no
+        headers:
+          Content-Type: "application/octet-stream"
+        status_code: 201, 204
+        timeout: 180
+
+          #  - name: Remove temporary WAR file from control node
+          #     file:
+          #  path: /tmp/app.war
+          #  state: absent
