@@ -52,19 +52,6 @@ Jenkins (CI/CD)
 &nbsp;&nbsp;v  
 Docker Registry
 
-## 🏗️ High-Level Architecture (Visual)
-
-```mermaid
-flowchart TD
-    Dev[Developer] --> GitHub[GitHub Repository]
-    GitHub --> Jenkins[Jenkins CI/CD]
-
-    Jenkins --> Sonar[SonarQube - Quality Gate]
-    Jenkins --> Nexus[Nexus - Artifact Repository]
-    Jenkins --> DockerHost[Docker Host - Build Runtime]
-
-    DockerHost --> Registry[Docker Registry]
-
 
 ### Infrastructure Layout
 
