@@ -52,6 +52,10 @@ Jenkins (CI/CD)
 &nbsp;&nbsp;v  
 Docker Registry
 
+## 📐 Architecture Overview
+
+![DevOps CI/CD Architecture](images/project-workflow.png)
+
 
 ### Infrastructure Layout
 
