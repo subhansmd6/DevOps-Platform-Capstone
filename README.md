@@ -37,20 +37,35 @@ The project covers the **entire lifecycle** of an application:
 
 ## 🏗️ High-Level Architecture
 
-Developer
-|
-v
-GitHub Repository
-|
-v
-Jenkins (CI/CD)
-|
-|---> SonarQube (Quality Gate)
-|---> Nexus (Artifacts)
-|---> Docker Host (Build Runtime)
-|
-v
+## 🏗️ High-Level Architecture
+
+Developer  
+&nbsp;&nbsp;│  
+&nbsp;&nbsp;v  
+GitHub Repository  
+&nbsp;&nbsp;│  
+&nbsp;&nbsp;v  
+Jenkins (CI/CD)  
+&nbsp;&nbsp;│  
+&nbsp;&nbsp;├───> SonarQube (Quality Gate)  
+&nbsp;&nbsp;├───> Nexus (Artifacts)  
+&nbsp;&nbsp;├───> Docker Host (Build Runtime)  
+&nbsp;&nbsp;│  
+&nbsp;&nbsp;v  
 Docker Registry
+
+## 🏗️ High-Level Architecture (Visual)
+
+```mermaid
+flowchart TD
+    Dev[Developer] --> GitHub[GitHub Repository]
+    GitHub --> Jenkins[Jenkins CI/CD]
+
+    Jenkins --> Sonar[SonarQube<br/>Quality Gate]
+    Jenkins --> Nexus[Nexus<br/>Artifact Repository]
+    Jenkins --> DockerHost[Docker Host<br/>Build Runtime]
+
+    DockerHost --> Registry[Docker Registry]
 
 
 ### Infrastructure Layout
@@ -72,32 +87,32 @@ Docker Registry
 devops-platform-capstone/
 │
 ├── terraform/
-│ ├── backend/
-│ ├── modules/
-│ │ ├── network/
-│ │ ├── security/
-│ │ ├── compute-jenkins/
-│ │ ├── compute-sonarqube/
-│ │ ├── compute-nexus/
-│ │ └── compute-docker/
-│ └── environments/
+│   ├── backend/
+│   ├── modules/
+│   │   ├── network/
+│   │   ├── security/
+│   │   ├── compute-jenkins/
+│   │   ├── compute-sonarqube/
+│   │   ├── compute-nexus/
+│   │   └── compute-docker/
+│   └── environments/
 │
 ├── ansible/
-│ ├── inventory/
-│ ├── roles/
-│ │ ├── jenkins/
-│ │ ├── sonarqube/
-│ │ ├── nexus/
-│ │ └── docker/
-│ └── playbooks/
+│   ├── inventory/
+│   ├── roles/
+│   │   ├── jenkins/
+│   │   ├── sonarqube/
+│   │   ├── nexus/
+│   │   └── docker/
+│   └── playbooks/
 │
 ├── jenkins/
-│ └── Jenkinsfile
+│   └── Jenkinsfile
 │
 ├── app/
-│ ├── src/
-│ ├── tests/
-│ └── Dockerfile
+│   ├── src/
+│   ├── tests/
+│   └── Dockerfile
 │
 └── README.md
 
