@@ -37,8 +37,6 @@ The project covers the **entire lifecycle** of an application:
 
 ## 🏗️ High-Level Architecture
 
-## 🏗️ High-Level Architecture
-
 Developer  
 &nbsp;&nbsp;│  
 &nbsp;&nbsp;v  
