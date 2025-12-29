@@ -59,9 +59,9 @@ flowchart TD
     Dev[Developer] --> GitHub[GitHub Repository]
     GitHub --> Jenkins[Jenkins CI/CD]
 
-    Jenkins --> Sonar[SonarQube<br/>Quality Gate]
-    Jenkins --> Nexus[Nexus<br/>Artifact Repository]
-    Jenkins --> DockerHost[Docker Host<br/>Build Runtime]
+    Jenkins --> Sonar[SonarQube - Quality Gate]
+    Jenkins --> Nexus[Nexus - Artifact Repository]
+    Jenkins --> DockerHost[Docker Host - Build Runtime]
 
     DockerHost --> Registry[Docker Registry]
 
