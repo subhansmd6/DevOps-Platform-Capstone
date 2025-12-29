@@ -71,8 +71,6 @@ Docker Registry
 
 ---
 
-## 📁 Repository Structure
-
 devops-platform-capstone/
 │
 ├── terraform/
@@ -104,7 +102,6 @@ devops-platform-capstone/
 │   └── Dockerfile
 │
 └── README.md
-
 
 ---
 
