@@ -1,0 +1,8 @@
+git
+pipeline-stage-view
+ssh-credentials
+maven-plugin
+sonar
+nexus-artifact-uploader
+docker-plugin
+docker-workflow
