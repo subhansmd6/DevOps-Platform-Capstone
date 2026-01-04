@@ -1,0 +1,133 @@
+  # =========================
+  # 1. INSTALL JAVA
+  # =========================
+  - name: Install Java 17
+    apt:
+      name: openjdk-17-jdk
+      state: present
+      update_cache: yes
+
+  # =========================
+  # 2. REQUIRED PACKAGES
+  # =========================
+  - name: Install required packages
+    apt:
+      name:
+        - ca-certificates
+        - curl
+        - gnupg
+      state: present
+      update_cache: yes
+
+  # =========================
+  # 3. ADD JENKINS REPO
+  # =========================
+  - name: Add Jenkins GPG key
+    get_url:
+      url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+      dest: /usr/share/keyrings/jenkins-keyring.asc
+      mode: '0644'
+
+  - name: Add Jenkins apt repository
+    apt_repository:
+      repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+      state: present
+
+  # =========================
+  # 4. INSTALL JENKINS
+  # =========================
+  - name: Install Jenkins
+    apt:
+      name: jenkins
+      state: present
+      update_cache: yes
+
+  # =========================
+  # 5. STOP JENKINS BEFORE CONFIG
+  # =========================
+  - name: Stop Jenkins service before configuration
+    service:
+      name: jenkins
+      state: stopped
+
+  # =========================
+  # 6. DISABLE SETUP WIZARD
+  # =========================
+  - name: Disable Jenkins setup wizard
+    lineinfile:
+      path: /etc/default/jenkins
+      regexp: '^JAVA_ARGS='
+      line: 'JAVA_ARGS="-Djenkins.install.runSetupWizard=false"'
+
+  # =========================
+  # 7. DOWNLOAD PLUGIN MANAGER
+  # =========================
+  - name: Download Jenkins plugin manager
+    get_url:
+      url: https://github.com/jenkinsci/plugin-installation-manager-tool/releases/latest/download/jenkins-plugin-manager-2.13.2.jar
+      dest: /usr/local/bin/jenkins-plugin-manager.jar
+      mode: '0755'
+
+  # =========================
+  # 8. COPY plugins.txt
+  # =========================
+  - name: Copy plugins.txt
+    copy:
+      src: plugins.txt
+      dest: /var/lib/jenkins/plugins.txt
+      owner: jenkins
+      group: jenkins
+      mode: '0644'
+
+  # =========================
+  # 9. INSTALL JENKINS PLUGINS
+  # =========================
+  - name: Install Jenkins plugins
+    command: >
+      java -jar /usr/local/bin/jenkins-plugin-manager.jar
+      --plugin-file /var/lib/jenkins/plugins.txt
+      --plugin-download-directory /var/lib/jenkins/plugins
+    args:
+      creates: /var/lib/jenkins/plugins/git.jpi
+    become: true
+
+  # =========================
+  # 10. CREATE ADMIN USER
+  # =========================
+  - name: Create Jenkins init.groovy.d directory
+    file:
+      path: /var/lib/jenkins/init.groovy.d
+      state: directory
+      owner: jenkins
+      group: jenkins
+      mode: '0755'
+    become: true
+
+  - name: Create Jenkins admin user
+    template:
+      src: create-admin.groovy.j2
+      dest: /var/lib/jenkins/init.groovy.d/create-admin.groovy
+      owner: jenkins
+      group: jenkins
+      mode: '0644'
+
+  # =========================
+  # 11. START JENKINS
+  # =========================
+  - name: Start and enable Jenkins
+    service:
+      name: jenkins
+      state: started
+      enabled: yes
+
+  # =========================
+  # 12. WAIT FOR JENKINS
+  # =========================
+  - name: Wait for Jenkins to be ready
+    uri:
+      url: http://localhost:8080
+      status_code: [200, 403]
+    register: result
+    retries: 30
+    delay: 10
+    until: result.status in [200, 403]
