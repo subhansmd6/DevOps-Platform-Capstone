@@ -6,7 +6,7 @@ resource "aws_instance" "this" {
   key_name               = var.key_name
 
   root_block_device {
-    volume_size = 25   # size in GB
-    volume_type = "gp3" # default is gp2, but gp3 is recommended
+    volume_size = 25   
+    volume_type = "gp3" 
   }
 }
