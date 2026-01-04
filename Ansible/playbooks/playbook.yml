@@ -1,0 +1,19 @@
+- hosts: _jenkins
+  become: yes
+  roles:
+    - jenkins
+
+- hosts: _sonarqube
+  become: yes
+  roles:
+    - sonarqube
+
+- hosts: _nexus
+  become: yes
+  roles:
+    - nexus
+
+- hosts: _docker
+  become: yes
+  roles:
+    - docker-host
