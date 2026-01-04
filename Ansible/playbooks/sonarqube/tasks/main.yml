@@ -1,0 +1,40 @@
+---
+# handlers file for sonarqube
+ubuntu@ip-172-31-12-62:~/DevOps-Platform-Capstone/Ansible/playbooks/sonarqube$ cat tasks/main.yml
+---
+- name: Install Docker
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+
+- name: Start and enable Docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Create data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: 0755
+  loop:
+    - /opt/sonarqube/data
+    - /opt/sonarqube/extensions
+    - /opt/sonarqube/logs
+
+- name: Run SonarQube container
+  community.docker.docker_container:
+    name: sonarqube
+    image: sonarqube:lts
+    state: started
+    restart_policy: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - /opt/sonarqube/data:/opt/sonarqube/data
+      - /opt/sonarqube/extensions:/opt/sonarqube/extensions
+      - /opt/sonarqube/logs:/opt/sonarqube/logs
