@@ -1,0 +1,35 @@
+---
+- name: Install Docker
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+
+- name: Start and enable Docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Create Nexus data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: 200
+    group: 200
+    mode: 0755
+  loop:
+    - /opt/nexus/data
+    - /opt/nexus/logs
+    - /opt/nexus/etc
+
+- name: Run Nexus container
+  community.docker.docker_container:
+    name: nexus
+    image: sonatype/nexus3:latest
+    state: started
+    restart_policy: always
+    ports:
+      - "8081:8081"
+    volumes:
+      - /opt/nexus/data:/nexus-data
