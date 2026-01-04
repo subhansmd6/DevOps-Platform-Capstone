@@ -1,0 +1,14 @@
+---
+jenkins_admin_user: admin
+jenkins_admin_password: admin123
+jenkins_http_port: 8080
+
+jenkins_plugins:
+  - git
+  - pipeline-stage-view
+  - ssh-credentials
+  - maven-plugin
+  - sonar
+  - nexus-artifact-uploader
+  - docker-plugin
+  - docker-workflow
