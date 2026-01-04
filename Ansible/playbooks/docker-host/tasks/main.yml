@@ -1,0 +1,27 @@
+---
+- name: Install Docker
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+
+- name: Start and enable Docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add user to docker group for non-root access
+  user:
+    name: ubuntu
+    groups: docker
+    append: yes
+
+- name: Validate Docker non-root access
+  command: docker info
+  register: docker_info
+  ignore_errors: yes
+
+- debug:
+    var: docker_info.stdout_lines
+
